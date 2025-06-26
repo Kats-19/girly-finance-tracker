@@ -107,7 +107,7 @@ if not st.session_state.authenticated:
         if password_input == "pass123":
             st.session_state.authenticated = True
             st.session_state.user_name = name_input or "Budget Babe"
-            st.experimental_rerun()
+            #st.experimental_rerun()
         else:
             st.error("Oops! Wrong passcode, queen 👑")
 
