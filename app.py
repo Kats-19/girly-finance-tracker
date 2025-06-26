@@ -74,7 +74,8 @@ set_styles()
 scope = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
 
 import json
-from streamlit.runtime.secrets import secrets
+import streamlit as st
+secrets = st.secrets
 
 gcp_secrets = dict(secrets["gcp_service_account"])
 gcp_secrets["private_key"] = gcp_secrets["private_key"].replace("\\n", "\n")
