@@ -79,6 +79,9 @@ secrets = st.secrets
 
 gcp_secrets = dict(secrets["gcp_service_account"])
 gcp_secrets["private_key"] = gcp_secrets["private_key"].replace("\\n", "\n")
+
+from oauth2client.service_account import ServiceAccountCredentials
+scope = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
 creds = ServiceAccountCredentials.from_json_keyfile_dict(gcp_secrets, scope)
 
 client = gspread.authorize(creds)
