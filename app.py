@@ -97,21 +97,58 @@ def save_to_google_sheet(name, year, month, type_, category, amount, notes=""):
 if "authenticated" not in st.session_state:
     st.session_state.authenticated = False
 
+def get_registered_users():
+    try:
+        user_sheet = client.open("Budget Data").worksheet("Users")
+        users = user_sheet.get_all_records()
+        return users
+    except:
+        # If the sheet doesn't exist, create it
+        sheet = client.open("Budget Data")
+        sheet.add_worksheet(title="Users", rows="100", cols="2")
+        user_sheet = sheet.worksheet("Users")
+        user_sheet.append_row(["Username", "Password"])
+        return []
+
+def save_new_user(username, password):
+    user_sheet = client.open("Budget Data").worksheet("Users")
+    user_sheet.append_row([username, password])
+
+def is_valid_user(username, password):
+    users = get_registered_users()
+    return any(user["Username"] == username and user["Password"] == password for user in users)
+
+def is_existing_user(username):
+    users = get_registered_users()
+    return any(user["Username"] == username for user in users)
+    
 if not st.session_state.authenticated:
-    st.title("🔐 Girlboss Finance Tracker Login")
-    name_input = st.text_input("Enter your name")
-    password_input = st.text_input("Enter your passcode", type="password")
+    st.title("🔐 Girlboss Finance Tracker")
+    auth_mode = st.radio("Select an option", ["Login", "Register"])
 
-    if st.button("Login"):
-        # You can change this logic to allow real password checking later
-        if password_input == "pass123":
-            st.session_state.authenticated = True
-            st.session_state.user_name = name_input or "Budget Babe"
-            #st.experimental_rerun()
-        else:
-            st.error("Oops! Wrong passcode, queen 👑")
+    username = st.text_input("Username")
+    password = st.text_input("Password", type="password")
 
-    st.stop()  # Prevents app from running further until logged in
+    if auth_mode == "Login":
+        if st.button("Login"):
+            if is_valid_user(username, password):
+                st.session_state.authenticated = True
+                st.session_state.user_name = username
+                st.success(f"Welcome back, {username} 💖")
+                st.experimental_rerun()
+            else:
+                st.error("Invalid username or password.")
+    else:
+        if st.button("Register"):
+            if is_existing_user(username):
+                st.warning("This username is already taken.")
+            elif username == "" or password == "":
+                st.warning("Username and password cannot be empty.")
+            else:
+                save_new_user(username, password)
+                st.success("Account created! Please login now.")
+    
+    st.stop()
 
 st.set_page_config(page_title="Girly Budget Tracker 💖", layout="centered")
 
