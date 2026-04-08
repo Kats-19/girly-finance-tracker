@@ -116,7 +116,11 @@ def save_new_user(username, password):
 
 def is_valid_user(username, password):
     users = get_registered_users()
-    return any(user["Username"] == username and user["Password"] == password for user in users)
+    return any(
+        str(user["Username"]).strip().lower() == username.strip().lower() and 
+        str(user["Password"]).strip() == password.strip()
+        for user in users
+    )
 
 def is_existing_user(username):
     users = get_registered_users()
